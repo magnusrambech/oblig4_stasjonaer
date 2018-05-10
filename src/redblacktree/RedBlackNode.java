@@ -1,3 +1,5 @@
+package redblacktree;
+
 public class RedBlackNode<T extends Comparable<T>>{
     /**
      * Possible color outcomes for a red/black node
@@ -5,7 +7,7 @@ public class RedBlackNode<T extends Comparable<T>>{
     public static final int BLACK = 0;
     public static final int RED = 1;
 
-    //key for noce
+    //key for node
     public T key;
 
     //linked nodes
@@ -29,7 +31,7 @@ public class RedBlackNode<T extends Comparable<T>>{
         right = null;
     }
     //Constructor which sets key to the node
-    RedBlackNode(T key){
+    public RedBlackNode(T key){
         this();
         this.key = key;
     }
