@@ -1,7 +1,5 @@
 package redblacktree;
 
-import com.sun.org.apache.regexp.internal.REDebugCompiler;
-
 public class RedBlackTree<T extends Comparable<T>> {
 
     private RedBlackNode<T> nil = new RedBlackNode<T>();

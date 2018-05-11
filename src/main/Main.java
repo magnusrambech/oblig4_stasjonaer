@@ -1,10 +1,12 @@
 package main;
 
+import binarytree.BinaryTree;
+import binarytree.BinaryTreeNode;
 import redblacktree.RedBlackNode;
 import redblacktree.RedBlackTree;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void launchWithRedBlackTree(){
         //Creates a RBT (Red black tree)
         RedBlackTree<Integer> rbtree = new RedBlackTree<Integer>();
 
@@ -35,7 +37,36 @@ public class Main {
 
 
         rbtree.printRightSide();
-       // rbtree.search(rbtree.getRoot(), 5);
+        rbtree.search(rbtree.getRoot(), 5);
+
+    }
+    public static void launchWithBinaryTree(){
+        BinaryTree<Integer> binTree = new BinaryTree<Integer>();
+
+        BinaryTreeNode<Integer> a = new BinaryTreeNode<>(9);
+        BinaryTreeNode<Integer> b = new BinaryTreeNode<>(6);
+        BinaryTreeNode<Integer> c = new BinaryTreeNode<>(15);
+        BinaryTreeNode<Integer> d = new BinaryTreeNode<>(12);
+        BinaryTreeNode<Integer> e = new BinaryTreeNode<>(7);
+        BinaryTreeNode<Integer> f = new BinaryTreeNode<>(10);
+
+        binTree.insert(a);
+        binTree.insert(b);
+        binTree.insert(c);
+        binTree.insert(d);
+        binTree.insert(e);
+        binTree.insert(f);
+
+        System.out.println("Root is nil: " + binTree.isNil(binTree.getRoot()));
+        System.out.println("Root key: " + binTree.getRoot().key);
+        System.out.println("Size of tree: " + binTree.size());
+
+    }
+    public static void main(String[] args) {
+        launchWithBinaryTree();
+        // launchWithRedBlackTree();
+
+
 
     }
 }
