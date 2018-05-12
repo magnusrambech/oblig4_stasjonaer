@@ -12,6 +12,11 @@ public interface ISortedTreeMap<K extends Comparable<? super K>, V> {
     Entry<K, V> min();
 
     /**
+     * Finds the minimum entry in a subtree, starting the from a given node.
+     */
+    Entry<K,V> min(Entry<K,V> rootNode);
+
+    /**
      * Finds the maximum entry (by key) in the map, if no key is found returns
      * null instead.
      * @return maximum value

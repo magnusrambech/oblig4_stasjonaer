@@ -1,24 +1,40 @@
+
+import java.nio.file.attribute.AclEntryType;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISortedTreeMap<K, V> {
-
+    private Entry<K,V> nil = new Entry<K,V>();
+    private Entry<K,V> root = nil;
 
     public  SortedTreeMap(Comparator <K> kComparator){
 
+
+
     }
 
-    /**
-     * Finds the minimum entry (by key) in the map, if no entry is found, returns
-     * null instead.
-     *
-     * @return minimum entry
-     */
+    public SortedTreeMap() {
+        root.left = nil;
+        root.right = nil;
+        root.parent = nil;
+    }
+
+
     @Override
     public Entry<K, V> min() {
         return null;
+    }
+
+    @Override
+    public Entry<K, V> min(Entry<K, V> rootNode) {
+        Entry<K,V> min = rootNode;
+        while(rootNode.left!=nil){
+            min = rootNode.left;
+            rootNode = rootNode.left;
+        }
+        return min;
     }
 
     /**
@@ -42,8 +58,63 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public V add(K key, V value) {
+
+        Entry<K,V> n = new Entry<K,V>(key,value);
+        /**
+         * Creates a reference to the root and initializes a nil node.
+         */
+        Entry<K,V> y = nil;
+        Entry<K,V> x = root;
+        while(!isNil(x)){
+            y = x;
+            if(n.key.compareTo(x.key) > 0){
+                System.out.println(n.key + " is greater than " + x.key +"...Going right");
+                x.numRight++;
+                x=x.right;
+            }
+            else if(n.key.compareTo(x.key) < 0){
+                System.out.println(n.key + " is lower than " + x.key +"...Going left");
+                x.numLeft++;
+                x = x.left;
+            }
+            else if(n.key.compareTo(x.key)== 0){
+                System.out.println(n.key + " already in tree, overwriting.. ");
+                System.out.println("Old value for key "+ x.key + " was " + x.value + ". New value is " + n.value);
+                V old = x.value;
+                x.value = n.value;
+                return old;
+
+            }
+
+        }
+        n.parent = y;
+
+        // Bestemmer om node n skal være et child av y på høyre eller venstre side
+        if(isNil(y)){
+            root = n;
+        }
+        else if(n.key.compareTo(y.key)< 0){
+            System.out.println("Setting n as left because "+n.key + " is less than " + y.key);
+            y.left = n;
+        }
+        else {
+            System.out.println("Setting n as right because "+n.key + " is greater than " + y.key);
+            y.right = n;
+        }
+
+        // Setter children av n til nil, og setter fargen til n som rød
+        n.left = nil;
+        n.right = nil;
+
         return null;
     }
+
+    /**
+     * checks if a node is a nil-node
+     * @param node node to check
+     * @return true/false if nil/!nil
+     */
+
 
     /**
      * Inserts the specified entry into the map. If the key is already a part of the map,
@@ -55,6 +126,10 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
     @Override
     public V add(Entry<K, V> entry) {
         return null;
+    }
+
+    public boolean isNil(Entry<K,V> node){
+        return node == nil;
     }
 
     /**
@@ -93,8 +168,88 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public V remove(Object key) throws NoSuchElementException {
+        if (containsKey((K)key)){
+
+            Entry<K,V> nodeToRemove = findNodeToRemoveByKey(key);
+            if(nodeToRemove!=null) {
+                //Node has one child
+                if (nodeToRemove.hasOneChildren()) {
+                    System.out.println("HAS ONE CHILD");
+                    if (nodeToRemove.parent.right == nodeToRemove) {
+                        nodeToRemove.parent.right = nodeToRemove.right;
+                    } else {
+                        nodeToRemove.parent.left = nodeToRemove.left;
+                    }
+
+                }
+                // Node has two children
+                else if (nodeToRemove.hasTwoChildren()) {
+                    System.out.println("HAS TWOO CHILDREN");
+                    Entry<K,V> min = min(nodeToRemove.right);
+
+                }
+                // Node has no children
+                else {
+                    System.out.println("HAS NO CHILDREN");
+                    if (nodeToRemove.parent.right == nodeToRemove) {
+                        nodeToRemove.parent.right = nil;
+                        return nodeToRemove.value;
+                    } else {
+                        nodeToRemove.parent.left = nil;
+                        return nodeToRemove.value;
+                    }
+                }
+            }
+        }
+            return null;
+    }
+
+
+    /**
+     * Finds node to remove by key, and reduces the size of the tree.
+     */
+    public Entry<K,V> findNodeToRemoveByKey(Object key){
+        K newKey = (K)key;
+        Entry<K,V> y = nil;
+        Entry<K,V> x = root;
+        while(!isNil(x)){
+            y = x;
+            if(newKey.compareTo(x.key) > 0){
+                x.numRight--;
+                x=x.right;
+
+            }
+            else if(newKey.compareTo(x.key) < 0){
+                x.numLeft--;
+                x = x.left;
+            }
+            else if(newKey.compareTo(x.key)== 0){
+                return x;
+            }
+        }
         return null;
     }
+
+    /**
+     * Finds node by key
+     */
+    public Entry<K,V> findNodeByKey(K key){
+        Entry<K,V> x = root;
+        while(!isNil(x)){
+            if(key.compareTo(x.key) > 0){
+                x = x.right;
+
+            }
+            else if(key.compareTo(x.key) < 0){
+                x = x.left;
+            }
+            else if(key.compareTo(x.key)== 0){
+                return x;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Retrieves the value for the key in the map.
@@ -116,6 +271,21 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public boolean containsKey(K key) {
+        K newKey = (K)key;
+        Entry<K,V> y = nil;
+        Entry<K,V> x = root;
+        while(!isNil(x)){
+            y = x;
+            if(newKey.compareTo(x.key) > 0){
+                x = x.right;
+            }
+            else if(newKey.compareTo(x.key) < 0){
+                x = x.left;
+            }
+            else if(newKey.compareTo(x.key)== 0){
+                return true;
+            }
+        }
         return false;
     }
 
@@ -213,7 +383,7 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public boolean isEmpty() {
-        return false;
+        return root == nil;
     }
 
     /**
@@ -223,7 +393,7 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public int size() {
-        return 0;
+        return root.numRight + root.numRight +1;
     }
 
     /**
