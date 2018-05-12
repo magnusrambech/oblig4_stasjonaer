@@ -9,6 +9,7 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
     private Entry<K,V> nil = new Entry<K,V>();
     private Entry<K,V> root = nil;
 
+
     public  SortedTreeMap(Comparator <K> kComparator){
 
 
@@ -24,7 +25,13 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
 
     @Override
     public Entry<K, V> min() {
-        return null;
+        Entry<K,V> min = root;
+        Entry<K,V> curr = root;
+        while(curr.left!=nil){
+            min = root.left;
+            curr = curr.left;
+        }
+        return min;
     }
 
     @Override
@@ -125,7 +132,7 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public V add(Entry<K, V> entry) {
-        return null;
+        return add(entry.key, entry.value);
     }
 
     public boolean isNil(Entry<K,V> node){
