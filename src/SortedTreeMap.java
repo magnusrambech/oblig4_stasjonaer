@@ -157,7 +157,13 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public void replace(K key, V value) throws NoSuchElementException {
-
+        if(root == nil){
+            throw new NoSuchElementException();
+        }
+        if(containsKey(key)){
+            findNodeByKey(key).value = value;
+        }
+        throw new NoSuchElementException();
     }
 
     /**
