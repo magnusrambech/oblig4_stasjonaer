@@ -128,6 +128,17 @@ public class Main {
         System.out.println("SIZE: " + test7.size());
         test7.remove(4);
         System.out.println("SIZE: " + test7.size());
+        System.out.println("MAX: " + test7.max().key);
+
+        System.out.println(test7.keys());
+
+        System.out.println("________________________TREE 8______________________________");
+        SortedTreeMap<Integer, String> test8 = new SortedTreeMap<>();
+        test8.add(1,"ein");
+        System.out.println("KEYS: " + test8.keys());
+        test8.remove(1);
+        System.out.println("KEYS: " + test8.keys());
+
 
 
     }

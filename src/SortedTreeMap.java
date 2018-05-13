@@ -23,11 +23,12 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
 
     @Override
     public Entry<K, V> min() {
+        if(root == nil){
+            return null;
+        }
         Entry<K,V> min = root;
-        Entry<K,V> curr = root;
-        while(curr.left!=nil){
-            min = root.left;
-            curr = curr.left;
+        while(min.left!=nil){
+            min = min.left;
         }
         return min;
     }
@@ -53,7 +54,14 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Entry<K, V> max() {
-        return null;
+        if(root == nil){
+            return null;
+        }
+        Entry<K,V> max = root;
+        while (max.right != nil ){
+            max = max.right;
+        }
+        return max;
     }
 
     /**
@@ -184,7 +192,6 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
             //Node has one child
             if (nodeToRemove.hasOneChildren(nil)) {
                 System.out.print("HAS ONE CHILD, ");
-
                 //If the child is right
                 if (nodeToRemove.right != nil) {
                     System.out.println(nodeToRemove.right.key + " . Child is right node");
@@ -244,12 +251,18 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
                                 System.out.println("MIN sin parent er " + min.parent.key);
                                 min.right.parent = min.parent;
                                 min.parent.left = min.right;
+                                min.right = root.right;
+                                min.left=root.left;
+                                root = min;
                                 return nodeToRemove.value;
                             }
                             else{
                                 System.out.println(min.key + " har 1 child på venstre side");
                                 min.left.parent = min.parent;
                                 min.parent.left = min.left;
+                                min.right = root.right;
+                                min.left = root.left;
+                                root=min;
                                 return nodeToRemove.value;
                             }
 
@@ -305,13 +318,36 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
                             System.out.println("MIN sin parent er " + min.parent.key);
                             min.right.parent = min.parent;
                             min.parent.left = min.right;
-                            return nodeToRemove.value;
+                            min.left = nodeToRemove.left;
+                            min.right = nodeToRemove.right;
+                            //If the node we're removing was the left child
+                            if (nodeToRemove.parent.left == nodeToRemove) {
+                                nodeToRemove.parent.left = min;
+                            }
+                            //If the node we're removing was the left child
+                            else if (nodeToRemove.parent.right == nodeToRemove) {
+                                nodeToRemove.parent.right = min;
+                            }
+                            nodeToRemove.parent.right = min;
+                            nodeToRemove.left.parent = min;
+                            nodeToRemove.right.parent = min;
+
+                            V old = nodeToRemove.value;
+                            nodeToRemove = min;
+                            return old;
                         }
+                        // Vil aldri hende
                         else{
                             System.out.println(min.key + " har 1 child på venstre side");
                             min.left.parent = min.parent;
                             min.parent.left = min.left;
-                            return nodeToRemove.value;
+                            min.left = nodeToRemove.left;
+                            min.right = nodeToRemove.right;
+                            min.parent = nodeToRemove.parent;
+
+                            V old = nodeToRemove.value;
+                            nodeToRemove = min;
+                            return old;
                         }
 
                     }
@@ -357,7 +393,6 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
             }
             return nodeToRemove.value;
         }
-        System.out.println("NOT FOUND");
         return null;
     }
 
@@ -391,7 +426,10 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public V getValue(Object key) throws NoSuchElementException {
-        return null;
+        if (containsKey((K) key)){
+            return findNodeByKey((K) key).value;
+        }
+        throw new NoSuchElementException();
     }
 
     /**
@@ -427,7 +465,14 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      * @return True if the value is present, false otherwise
      */
     @Override
-    public boolean containsValue(V value) {
+    public boolean containsValue(V value){
+        ArrayList<K> keys = (ArrayList<K>) keys();
+
+        for(K key : keys){
+            if(findNodeByKey(key).value == value){
+                return true;
+            }
+        }
         return false;
     }
 
@@ -442,9 +487,12 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
         ArrayList<K> sorted = gatherKeysFromNode(root);
         if(sorted!=null){
             Collections.sort(sorted);
+            return sorted;
         }
+        sorted = new ArrayList<K>();
         return sorted;
     }
+
     public ArrayList<K> gatherKeysFromNode(Entry<K,V> current){
         // if it's null, it doesn't exist, return 0
         if (current == nil){
@@ -484,7 +532,12 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Iterable<Entry<K, V>> entries() {
-        return null;
+        ArrayList<Entry<K,V>> entries = new ArrayList<>();
+        ArrayList<K> keys = (ArrayList<K>) keys();
+        for(K key : keys){
+            entries.add(new Entry<K,V>(key, findNodeByKey(key).value));
+        }
+        return entries;
     }
 
     /**
@@ -580,7 +633,7 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public void clear() {
-
+        root=nil;
     }
 
     @Override
