@@ -163,7 +163,9 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
         if(containsKey(key)){
             findNodeByKey(key).value = value;
         }
-        throw new NoSuchElementException();
+        else{
+            throw new NoSuchElementException();
+        }
     }
 
     /**
@@ -555,6 +557,23 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Entry<K, V> higherOrEqualEntry(K key) {
+        System.out.println("looking for higher or equal to " + key);
+        ArrayList<K> keys = (ArrayList<K>) keys();
+
+        for(K currKey : keys){
+            if(currKey.compareTo(key) == 0){
+                System.out.println("key finnes! ");
+                return findNodeByKey(currKey);
+
+            }
+            else if(currKey.compareTo(key) < 0){
+
+            }
+            else {
+                System.out.println("fant høyere!" + currKey + " er høyere enn " + key);
+                return findNodeByKey(currKey);
+            }
+        }
         return null;
     }
 
@@ -567,6 +586,24 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Entry<K, V> lowerOrEqualEntry(K key) {
+        System.out.println("looking for lower or equal to " + key);
+        ArrayList<K> keys = (ArrayList<K>) keys();
+        Collections.reverse(keys);
+
+        for(K currKey : keys){
+            if(currKey.compareTo(key) == 0){
+                System.out.println("key finnes! ");
+                return findNodeByKey(currKey);
+
+            }
+            else if(currKey.compareTo(key) < 0){
+                System.out.println(currKey + " er lavere enn " + key);
+                return findNodeByKey(currKey);
+            }
+            else {
+
+            }
+        }
         return null;
     }
 
