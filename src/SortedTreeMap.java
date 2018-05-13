@@ -1,19 +1,17 @@
 
 import java.nio.file.attribute.AclEntryType;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISortedTreeMap<K, V> {
     private Entry<K,V> nil = new Entry<K,V>();
     private Entry<K,V> root = nil;
-
+    private Comparator<K> kComparator;
+    private ArrayList<K> keys = new ArrayList<K>();
 
     public  SortedTreeMap(Comparator <K> kComparator){
-
-
-
+        this.kComparator = kComparator;
     }
 
     public SortedTreeMap() {
@@ -37,6 +35,9 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
     @Override
     public Entry<K, V> min(Entry<K, V> rootNode) {
         Entry<K,V> min = rootNode;
+        if(rootNode.left == null){
+            return min;
+        }
         while(rootNode.left!=nil){
             min = rootNode.left;
             rootNode = rootNode.left;
@@ -76,12 +77,10 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
             y = x;
             if(n.key.compareTo(x.key) > 0){
                 System.out.println(n.key + " is greater than " + x.key +"...Going right");
-                x.numRight++;
                 x=x.right;
             }
             else if(n.key.compareTo(x.key) < 0){
                 System.out.println(n.key + " is lower than " + x.key +"...Going left");
-                x.numLeft++;
                 x = x.left;
             }
             else if(n.key.compareTo(x.key)== 0){
@@ -98,6 +97,7 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
 
         // Bestemmer om node n skal være et child av y på høyre eller venstre side
         if(isNil(y)){
+            System.out.println("Setting " + n.key +" as root");
             root = n;
         }
         else if(n.key.compareTo(y.key)< 0){
@@ -175,65 +175,189 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public V remove(Object key) throws NoSuchElementException {
+        //Sjekker om objektet finnes
         if (containsKey((K)key)){
+            Entry<K,V> nodeToRemove = findNodeByKey((K)key);
+            System.out.println("REMOVING " + nodeToRemove.key);
+            System.out.println("VALUE: " + nodeToRemove.value);
 
-            Entry<K,V> nodeToRemove = findNodeToRemoveByKey(key);
-            if(nodeToRemove!=null) {
-                //Node has one child
-                if (nodeToRemove.hasOneChildren()) {
-                    System.out.println("HAS ONE CHILD");
-                    if (nodeToRemove.parent.right == nodeToRemove) {
+            //Node has one child
+            if (nodeToRemove.hasOneChildren(nil)) {
+                System.out.print("HAS ONE CHILD, ");
+
+                //If the child is right
+                if (nodeToRemove.right != nil) {
+                    System.out.println(nodeToRemove.right.key + " . Child is right node");
+                    if(nodeToRemove == root){
+                        root = nodeToRemove.right;
+                        root.parent = nil;
+                        return nodeToRemove.value;
+                    }
+
+                    //If the node to remove is the left node of its parent
+                    if(nodeToRemove.parent.left == nodeToRemove){
+                        nodeToRemove.parent.left = nodeToRemove.right;
+                    }
+                    else{
                         nodeToRemove.parent.right = nodeToRemove.right;
-                    } else {
+                    }
+                }
+                //If the child is left
+                else if(nodeToRemove.left != nil) {
+                    System.out.println("child is left node");
+
+                    if(nodeToRemove==root){
+                        root = nodeToRemove.left;
+                        root.parent = nil;
+                        return nodeToRemove.value;
+                    }
+                    //If the node to remove is the left node of its parent
+                    if(nodeToRemove.parent.left == nodeToRemove){
                         nodeToRemove.parent.left = nodeToRemove.left;
                     }
-
-                }
-                // Node has two children
-                else if (nodeToRemove.hasTwoChildren()) {
-                    System.out.println("HAS TWOO CHILDREN");
-                    Entry<K,V> min = min(nodeToRemove.right);
-
-                }
-                // Node has no children
-                else {
-                    System.out.println("HAS NO CHILDREN");
-                    if (nodeToRemove.parent.right == nodeToRemove) {
-                        nodeToRemove.parent.right = nil;
-                        return nodeToRemove.value;
-                    } else {
-                        nodeToRemove.parent.left = nil;
-                        return nodeToRemove.value;
+                    else{
+                        nodeToRemove.parent.right = nodeToRemove.left;
                     }
                 }
+
             }
+
+
+            // Node has two children
+            else if (nodeToRemove.hasTwoChildren(nil)){
+                Entry<K,V> min = min(nodeToRemove.right);
+                System.out.println("HAS TWOO CHILDREN: " + nodeToRemove.left.key +", " + nodeToRemove.right.key );
+                System.out.println("MIN IN RIGHT SUB TREE: " + min.key);
+                // If the lowest node in right sub tree is the node we're removing's right child
+                if(nodeToRemove==root){
+                    System.out.println("PRØVER Å FJERNE ROOT");
+                    System.out.println(min.key + " SKAL TA OVER!");
+                    if(min == nodeToRemove.right){
+                        min.left = root.left;
+                        root.left.parent = min;
+                        root=min;
+                    }
+                    else{
+                        if(min.hasOneChildren(nil)){
+                            if(min.right!=nil){
+                                System.out.println(min.key + " har 1 child på høyre side, " + min.right.key);
+                                System.out.println("MIN sin parent er " + min.parent.key);
+                                min.right.parent = min.parent;
+                                min.parent.left = min.right;
+                                return nodeToRemove.value;
+                            }
+                            else{
+                                System.out.println(min.key + " har 1 child på venstre side");
+                                min.left.parent = min.parent;
+                                min.parent.left = min.left;
+                                return nodeToRemove.value;
+                            }
+
+                        }
+                        min.left = root.left;
+                        min.right = root.right;
+                        root.left.parent = min;
+                        root.right.parent = min;
+                        root = min;
+                        min.parent.left = nil;
+                    }
+
+                }
+                else if(min == nodeToRemove.right){
+                   nodeToRemove.left.parent = min;
+                   min.parent = nodeToRemove.parent;
+                   min.left = nodeToRemove.left;
+
+                   //If the node we're removing was the left child
+                    if (nodeToRemove.parent.left == nodeToRemove) {
+                        nodeToRemove.parent.left = min;
+                    }
+                    //If the node we're removing was the left child
+                    else if (nodeToRemove.parent.right == nodeToRemove) {
+                        nodeToRemove.parent.right = min;
+                    }
+
+
+                }
+                else if(min==nodeToRemove.left){
+                    //Sets both children parent as the new node, which was the lowest in right sub tree.
+                    nodeToRemove.right.parent = min;
+                    nodeToRemove.left.parent = min;
+                        //If the node we're removing was the left child
+                        if (nodeToRemove.parent.left == nodeToRemove) {
+                            nodeToRemove.parent.left = min;
+                        }
+                        //If the node we're removing was the left child
+                        else if (nodeToRemove.parent.right == nodeToRemove) {
+                            nodeToRemove.parent.right = min;
+                        }
+                        min.parent.left = nil;
+                        min.parent = nodeToRemove.parent;
+                        min.left = nodeToRemove.left;
+                        min.right = nodeToRemove.right;
+
+
+                }
+                else{
+                    if(min.hasOneChildren(nil)){
+                        if(min.right!=nil){
+                            System.out.println(min.key + " har 1 child på høyre side, " + min.right.key);
+                            System.out.println("MIN sin parent er " + min.parent.key);
+                            min.right.parent = min.parent;
+                            min.parent.left = min.right;
+                            return nodeToRemove.value;
+                        }
+                        else{
+                            System.out.println(min.key + " har 1 child på venstre side");
+                            min.left.parent = min.parent;
+                            min.parent.left = min.left;
+                            return nodeToRemove.value;
+                        }
+
+                    }
+                    min.parent.left = nil;
+                    min.parent = nodeToRemove.parent;
+                    if (nodeToRemove.parent.left == nodeToRemove) {
+                        nodeToRemove.parent.left = min;
+                    }
+                    //If the node we're removing was the left child
+                    else if (nodeToRemove.parent.right == nodeToRemove) {
+                        nodeToRemove.parent.right = min;
+                    }
+                    min.right = nodeToRemove.right;
+                    min.left = nodeToRemove.left;
+                    min.right.parent = min;
+
+
+
+
+                }
+
+            }
+            // Node has no children
+            else {
+                System.out.println("HAS NO CHILDREN");
+                if(nodeToRemove==root){
+                   root = nil;
+                   root.key = null;
+                   root.value = null;
+                   root.left = nil;
+                   root.right = nil;
+                }
+                else{
+                    if (nodeToRemove.parent.right == nodeToRemove) {
+                        nodeToRemove.parent.right = nil;
+
+                    } else {
+                        nodeToRemove.parent.left = nil;
+
+                    }
+                }
+
+            }
+            return nodeToRemove.value;
         }
-            return null;
-    }
-
-
-    /**
-     * Finds node to remove by key, and reduces the size of the tree.
-     */
-    public Entry<K,V> findNodeToRemoveByKey(Object key){
-        K newKey = (K)key;
-        Entry<K,V> y = nil;
-        Entry<K,V> x = root;
-        while(!isNil(x)){
-            y = x;
-            if(newKey.compareTo(x.key) > 0){
-                x.numRight--;
-                x=x.right;
-
-            }
-            else if(newKey.compareTo(x.key) < 0){
-                x.numLeft--;
-                x = x.left;
-            }
-            else if(newKey.compareTo(x.key)== 0){
-                return x;
-            }
-        }
+        System.out.println("NOT FOUND");
         return null;
     }
 
@@ -314,7 +438,27 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Iterable<K> keys() {
-        return null;
+        keys.clear();
+        ArrayList<K> sorted = gatherKeysFromNode(root);
+        if(sorted!=null){
+            Collections.sort(sorted);
+        }
+        return sorted;
+    }
+    public ArrayList<K> gatherKeysFromNode(Entry<K,V> current){
+        // if it's null, it doesn't exist, return 0
+        if (current == nil){
+            return null;
+        }
+        keys.add(current.key);
+        if(current.right != nil){
+            gatherKeysFromNode(current.right);
+        }
+        if(current.left != nil){
+            gatherKeysFromNode(current.left);
+        }
+
+        return keys;
     }
 
     /**
@@ -324,7 +468,13 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Iterable<V> values() {
-        return null;
+        // Refreshes list of keys
+        keys();
+        ArrayList<V> values = new ArrayList<V>();
+        for(K key : keys){
+            values.add(findNodeByKey(key).value);
+        }
+        return values;
     }
 
     /**
@@ -400,8 +550,30 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public int size() {
-        return root.numRight + root.numRight +1;
+        return nodes(root);
     }
+
+    /**
+     * Recursive method that counts all nodes in tree.
+     * @param current
+     * @return
+     */
+    private int nodes(Entry<K,V> current) {
+        // if it's null, it doesn't exist, return 0
+        if (current == nil){
+            return 0;
+        }
+        int c = 1;
+        if(current.right != nil){
+            c += nodes(current.right);
+        }
+        if(current.left != nil){
+            c += nodes(current.left);
+        }
+        return c;
+
+    }
+
 
     /**
      * Clears the map of entries.
@@ -409,5 +581,10 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
     @Override
     public void clear() {
 
+    }
+
+    @Override
+    public Entry<K, V> getRoot() {
+        return root;
     }
 }

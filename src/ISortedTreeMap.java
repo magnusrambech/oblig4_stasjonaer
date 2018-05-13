@@ -153,4 +153,6 @@ public interface ISortedTreeMap<K extends Comparable<? super K>, V> {
      *  Clears the map of entries.
      */
     void clear();
+
+    Entry<K,V> getRoot();
 }

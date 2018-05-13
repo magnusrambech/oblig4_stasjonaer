@@ -11,8 +11,6 @@ public class Entry<K, V> {
     public int numRight;
 
     public Entry(){
-        numLeft = 0;
-        numRight = 0;
         parent = null;
         left = null;
         right = null;
@@ -34,10 +32,10 @@ public class Entry<K, V> {
         return false;
     }
 
-    public boolean hasOneChildren(){
-        return  (left !=null && right ==null) || (left==null && right !=null);
+    public boolean hasOneChildren(Entry<K,V> nilNode){
+        return  (left !=nilNode && right ==nilNode) || (left==nilNode && right !=nilNode);
     }
-    public boolean hasTwoChildren(){
-        return left.key!=null && right.key!=null;
+    public boolean hasTwoChildren(Entry<K,V> nilNode){
+        return left!=nilNode && right!=nilNode;
     }
 }
