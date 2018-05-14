@@ -7,11 +7,10 @@ import java.util.function.BiPredicate;
 public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISortedTreeMap<K, V> {
     private Entry<K,V> nil = new Entry<K,V>();
     private Entry<K,V> root = nil;
-    private Comparator<K> kComparator;
     private ArrayList<K> keys = new ArrayList<K>();
 
     public  SortedTreeMap(Comparator <K> kComparator){
-        this.kComparator = kComparator;
+        Comparator<K> kComparator1 = kComparator;
     }
 
     /**
@@ -313,7 +312,6 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
     @Override
     public boolean containsValue(V value){
         ArrayList<K> keys = (ArrayList<K>) keys();
-
         for(K key : keys){
             if(findNodeByKey(key).value == value){
                 return true;
