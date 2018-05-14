@@ -525,6 +525,10 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
         root=nil;
     }
 
+    /**
+     * Returns rootnode
+     * @return root
+     */
     @Override
     public Entry<K, V> getRoot() {
         return root;
