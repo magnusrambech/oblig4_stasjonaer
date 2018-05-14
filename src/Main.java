@@ -4,6 +4,16 @@
 
 public class Main {
 
+
+    public static void main(String[] args) {
+        launchWithBinaryTree();
+
+
+
+
+    }
+
+
     public static void launchWithBinaryTree(){
 
         System.out.println("________________________TREE 1______________________________");
@@ -24,9 +34,9 @@ public class Main {
         System.out.println("Size: " + test.size());
         System.out.println("Root: " + test.getRoot().key);
         test.remove(12);
-       System.out.println("Contains key removed: " + test.containsKey(12));
-       System.out.println("Size: " + test.size());
-       System.out.println("Root: " + test.getRoot().key);
+        System.out.println("Contains key removed: " + test.containsKey(12));
+        System.out.println("Size: " + test.size());
+        System.out.println("Root: " + test.getRoot().key);
 
 
         System.out.println("________________________TREE 2______________________________");
@@ -154,12 +164,5 @@ public class Main {
         System.out.println(test10.size());
         test10.replace(2,"hei");
         System.out.println(test10.getRoot().key);
-    }
-    public static void main(String[] args) {
-        launchWithBinaryTree();
-
-
-
-
     }
 }

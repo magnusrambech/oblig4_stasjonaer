@@ -14,13 +14,20 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
         this.kComparator = kComparator;
     }
 
+    /**
+     * Constructor
+     */
     public SortedTreeMap() {
         root.left = nil;
         root.right = nil;
         root.parent = nil;
     }
 
-
+    /**
+     * Finds the minimum entry (by key) in the map, if no entry is found, returns
+     * null instead.
+     * @return minimum entry
+     */
     @Override
     public Entry<K, V> min() {
         if(root == nil){
@@ -33,6 +40,11 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
         return min;
     }
 
+    /**
+     * Finds the minimum entry (by key) in the map from a given node, if no entry is found, returns
+     * null instead.
+     * @return minimum entry
+     */
     @Override
     public Entry<K, V> min(Entry<K, V> rootNode) {
         Entry<K,V> min = rootNode;
@@ -84,16 +96,12 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
         while(!isNil(x)){
             y = x;
             if(n.key.compareTo(x.key) > 0){
-                System.out.println(n.key + " is greater than " + x.key +"...Going right");
                 x=x.right;
             }
             else if(n.key.compareTo(x.key) < 0){
-                System.out.println(n.key + " is lower than " + x.key +"...Going left");
                 x = x.left;
             }
             else if(n.key.compareTo(x.key)== 0){
-                System.out.println(n.key + " already in tree, overwriting.. ");
-                System.out.println("Old value for key "+ x.key + " was " + x.value + ". New value is " + n.value);
                 V old = x.value;
                 x.value = n.value;
                 return old;
@@ -103,21 +111,18 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
         }
         n.parent = y;
 
-        // Bestemmer om node n skal være et child av y på høyre eller venstre side
+        //Decides if the node n should be on the left/right side of y.
         if(isNil(y)){
-            System.out.println("Setting " + n.key +" as root");
             root = n;
         }
         else if(n.key.compareTo(y.key)< 0){
-            System.out.println("Setting n as left because "+n.key + " is less than " + y.key);
             y.left = n;
         }
         else {
-            System.out.println("Setting n as right because "+n.key + " is greater than " + y.key);
             y.right = n;
         }
 
-        // Setter children av n til nil, og setter fargen til n som rød
+        //Sets the children of n to nil
         n.left = nil;
         n.right = nil;
 
@@ -160,10 +165,8 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
 
         if (!containsKey(key))
         {
-            System.out.println(key + " finnes ikke i tre, kaster exception");
             throw new NoSuchElementException();
         }
-            System.out.println("old value: " + findNodeByKey(key).value + ". new value: "+ value);
             findNodeByKey(key).value = value;
     }
 
@@ -179,16 +182,14 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
     public void replace(K key, BiFunction<K, V, V> f) throws NoSuchElementException {
         if (!containsKey(key))
         {
-            System.out.println(key + " finnes ikke i tre, kaster exception");
             throw new NoSuchElementException();
-        }else {
-            V newVal = f.apply(findNodeByKey(key).key,findNodeByKey(key).value);
-            findNodeByKey(key).value = newVal;
+        }
+        else {
+            findNodeByKey(key).value = f.apply(findNodeByKey(key).key,findNodeByKey(key).value);
         }
 
     }
 
-    //TOOORDS
     /**
      * Removes the entry for key in the map. Throws an exception if the key is not present
      * in the map.
@@ -204,6 +205,12 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
         return result;
     }
 
+    /**
+     *
+     * @param key
+     * @param toRemove
+     * @return toRemove
+     */
     private Entry<K,V> removeEntry(K key, Entry<K, V> toRemove){
         if(toRemove == nil) {
             return null;
@@ -235,6 +242,8 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
 
     /**
      * Finds node by key
+     * @param key key of node to find
+     * @return node if it exists in tree, null otherwise
      */
     public Entry<K,V> findNodeByKey(K key){
         Entry<K,V> x = root;
@@ -331,7 +340,6 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
     }
 
     public ArrayList<K> gatherKeysFromNode(Entry<K,V> current){
-        // if it's null, it doesn't exist, return 0
         if (current == nil){
             return null;
         }
@@ -386,12 +394,10 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Entry<K, V> higherOrEqualEntry(K key) {
-        System.out.println("looking for higher or equal to " + key);
         ArrayList<K> keys = (ArrayList<K>) keys();
 
         for(K currKey : keys){
             if(currKey.compareTo(key) == 0){
-                System.out.println("key finnes! ");
                 return findNodeByKey(currKey);
 
             }
@@ -399,7 +405,7 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
 
             }
             else {
-                System.out.println("fant høyere!" + currKey + " er høyere enn " + key);
+
                 return findNodeByKey(currKey);
             }
         }
@@ -415,18 +421,15 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
      */
     @Override
     public Entry<K, V> lowerOrEqualEntry(K key) {
-        System.out.println("looking for lower or equal to " + key);
         ArrayList<K> keys = (ArrayList<K>) keys();
         Collections.reverse(keys);
 
         for(K currKey : keys){
             if(currKey.compareTo(key) == 0){
-                System.out.println("key finnes! ");
                 return findNodeByKey(currKey);
 
             }
             else if(currKey.compareTo(key) < 0){
-                System.out.println(currKey + " er lavere enn " + key);
                 return findNodeByKey(currKey);
             }
             else {
@@ -445,9 +448,6 @@ public class SortedTreeMap<K extends Comparable<? super K>, V> implements ISorte
     @Override
     public void merge(ISortedTreeMap<K, V> other) {
         SortedTreeMap<K,V> otherTree = (SortedTreeMap<K,V>) other;
-        System.out.println(keys());
-        System.out.println(otherTree.keys());
-
         for(Entry<K,V> entry : otherTree.entries()){
             if(entry != null || entry != nil){
                 add(entry);

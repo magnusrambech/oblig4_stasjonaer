@@ -526,6 +526,25 @@ public class SortedTreeMapTest {
             return prop(nokeys && novalues && noentries && empty && size0);
         });
     }
+    /**
+     * Check that we can remove entries using a predicate over the key-value pair,
+     * but don't check the order.
+     *
+     */
+    public Property remove_if_dont_check_sort() {
+        return property(isKVList, arbF(cogenInteger, arbBoolean), (kvs, predicate) -> {
+            SortedTreeMap<Integer, String> tm = new SortedTreeMap<>(intOrd.toComparator());
+            kvs.foreachDoEffect(kv -> tm.add(kv._1(), kv._2()));
+
+            tm.removeIf((key, value) -> predicate.f(key));
+
+            Set<Integer> keys = Set.iteratorSet(intOrd, tm.keys().iterator());
+            Set<Integer> kept = Set.iterableSet(intOrd, kvs.map(P2::_1).filter(key -> !predicate.f(key)));
+
+            return prop(keys.equals(kept));
+        });
+    }
+
 
     /**
      * Check that we can remove entries using a predicate over the key-value pair.
