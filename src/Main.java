@@ -139,8 +139,21 @@ public class Main {
         test8.remove(1);
         System.out.println("KEYS: " + test8.keys());
 
+        System.out.println("________________________TREE 9______________________________");
+        SortedTreeMap<Integer, String> test9 = new SortedTreeMap<>();
+        test9.add(-2,"hjgk");
+        test9.add(0,"ghjeah");
+        test9.add(-1,"huyui");
+        test9.add(8,"jiojio");
+        test9.remove(-2);
 
 
+        System.out.println("________________________TREE 10______________________________");
+        SortedTreeMap<Integer, String> test10 = new SortedTreeMap<>();
+        test10.add(1,"gjegk");
+        System.out.println(test10.size());
+        test10.replace(2,"hei");
+        System.out.println(test10.getRoot().key);
     }
     public static void main(String[] args) {
         launchWithBinaryTree();
